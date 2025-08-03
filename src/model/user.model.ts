@@ -1,14 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
 import { IUser, IImage, BaseDocument, IOperatingHours, IAddress, ICustomer, IRestaurantOwner, IDeliveryDriver, IRating } from "../interface/user.interface";
-
-// const UserSchema = new Schema<IUser>({
-
-// }, {
-//   toJSON: { virtuals: true },
-//   toObject: { virtuals: true },
-// });
-
-
 // Image Schema (embedded)
 
 const imageSchema = new Schema<IImage>({
