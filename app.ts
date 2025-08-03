@@ -13,7 +13,7 @@ import ConnectDB from "./src/configs/db.config";
 
 import AppError from "./src/error/AppError";
 import GlobalErrorHandler from "./src/error/errorHandler";
-// import authRoutes from "./src/routes/auth.route";
+import authRoutes from "./src/routes/auth.routes";
 
 
 import logger, { logRequest } from "./src/middleware/logger";
@@ -70,8 +70,8 @@ const shouldCompress = (req: express.Request, res: express.Response) => {
 
 app.use(compression({ filter: shouldCompress }));
 
-//All Routes comes in Here
-// app.use("/v1/api/auth", authRoutes);
+  //All Routes comes in Here
+  app.use("/v1/api/auth", authRoutes);
 // app.use("/v1/api/user", userRoutes);
 
 
