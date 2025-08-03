@@ -1,16 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { IUser, IImage, BaseDocument, IOperatingHours, IAddress, ICustomer, IRestaurantOwner, IDeliveryDriver, IRating } from "../interface/user.interface";
 
-// const UserSchema = new Schema<IUser>({
-
-// }, {
-//   toJSON: { virtuals: true },
-//   toObject: { virtuals: true },
-// });
-
-
 // Image Schema (embedded)
-
 const imageSchema = new Schema<IImage>({
   key: { type: String, default: "" },
   url: { type: String, default: "" }
@@ -112,7 +103,7 @@ UserSchema.set("toObject", {
   },
 });
 
-// Customer Schema (discriminator)
+// Customer Schema (discriminator) - DO NOT redefine 'role'
 const CustomerSchema: Schema<ICustomer> = new Schema({
   orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
   cart: { type: Schema.Types.ObjectId, ref: "Cart", default: null },
@@ -127,7 +118,7 @@ const CustomerSchema: Schema<ICustomer> = new Schema({
   loyaltyPoints: { type: Number, default: 0 }
 });
 
-// Restaurant Owner Schema (discriminator)
+// Restaurant Owner Schema (discriminator) - DO NOT redefine 'role'
 const RestaurantOwnerSchema: Schema<IRestaurantOwner> = new Schema({
   restaurant: {
     type: new Schema({
@@ -186,7 +177,7 @@ const RestaurantOwnerSchema: Schema<IRestaurantOwner> = new Schema({
   }
 });
 
-// Delivery Driver Schema (discriminator)
+// Delivery Driver Schema (discriminator) - DO NOT redefine 'role'
 const DeliveryDriverSchema: Schema<IDeliveryDriver> = new Schema({
   driver: {
     type: new Schema({
@@ -233,15 +224,14 @@ const DeliveryDriverSchema: Schema<IDeliveryDriver> = new Schema({
   }
 });
 
-
+// Create the base User model
 const User = mongoose.model<IUser>("User", UserSchema);
-const Customer = User.discriminator<ICustomer>("Customer", CustomerSchema);
-const RestaurantOwner = User.discriminator<IRestaurantOwner>("RestaurantOwner", RestaurantOwnerSchema);
-const DeliveryDriver = User.discriminator<IDeliveryDriver>("DeliveryDriver", DeliveryDriverSchema);
 
+// Create discriminators
+const Customer = User.discriminator<ICustomer>("customer", CustomerSchema);
+const RestaurantOwner = User.discriminator<IRestaurantOwner>("restaurant_owner", RestaurantOwnerSchema);
+const DeliveryDriver = User.discriminator<IDeliveryDriver>("delivery_driver", DeliveryDriverSchema);
 
 export { User, Customer, RestaurantOwner, DeliveryDriver, imageSchema, addressSchema, operatingHoursSchema, ratingSchema, bankDetailsSchema };
-
-
 
 export default UserSchema;
