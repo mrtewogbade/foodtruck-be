@@ -117,3 +117,9 @@ export const registerHandler = catchAsync(
     );
   }
 );
+
+
+export const loginHandler = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+
+  })
