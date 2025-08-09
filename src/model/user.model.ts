@@ -50,6 +50,7 @@ const bankDetailsSchema = new Schema({
 // Base User Schema
 const UserSchema: Schema<IUser> = new Schema(
   {
+    _id: { type: Schema.Types.ObjectId, auto: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String },
