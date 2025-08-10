@@ -1,18 +1,3 @@
-// import {Request, Response, NextFunction} from "express";
-// import { ZodSchema } from "zod";
-// import AppError from "../errors/AppError";
-// const validate = (schema:ZodSchema<any>)=>(req:Request, res:Response, next:NextFunction)=>{
-//     try {
-//         schema.parse(req.body)
-//         next()
-//     } catch (err:any) {
-//         const zodError = JSON.parse(err)
-//         const errorMessages:string = zodError.map((error:Error)=>`${error.message}`).join(", ")
-//         return next(new AppError(errorMessages, 400))
-//     }
-// }
-// export default validate
-
 import { Request, Response, NextFunction } from "express";
 import { ZodSchema , z } from "zod";
 import AppError from "../error/AppError";
