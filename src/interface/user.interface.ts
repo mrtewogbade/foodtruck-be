@@ -41,6 +41,7 @@ export interface IAddress {
 
 
 export interface IUser extends BaseDocument {
+  _id: ObjectId;
   name: string;
   email: string;
   password?: string;
