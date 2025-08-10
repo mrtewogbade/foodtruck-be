@@ -6,7 +6,7 @@ const addressSchema = z.object({
   street: z.string().min(1, "Street is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
-  postalCode: z.string().min(1, "Postal code is required"),
+  zipCode: z.string().min(1, "Zip code is required"),
   country: z.string().min(1, "Country is required"),
 });
 
@@ -43,25 +43,25 @@ const bankDetailsSchema = z.object({
 
 export const createRestaurantSchema = z.object({
   restaurantName: z.string().min(1, "Restaurant name is required"),
-  restaurantDescription: z.string().min(1, "Description is required"),
-  cuisine: z.array(z.string().min(1, "Cuisine is required")).min(1),
+  // restaurantDescription: z.string().min(1, "Description is required"),
+  // cuisine: z.array(z.string().min(1, "Cuisine is required")).min(1),
   address: addressSchema,
   phone: z.string().min(7, "Phone number must be valid"),
   email: z.string().email("Invalid email"),
   images: z.array(z.string().url()).optional(),
   logo: z.string().url().optional(),
   operatingHours: z.array(operatingHoursSchema).optional(),
-  deliveryInfo: z.object({
-    isDeliveryAvailable: z.boolean().default(true),
-    deliveryRadius: z.number().min(0),
-    minimumOrderAmount: z.number().min(0).default(0),
-    deliveryFee: z.number().min(0).default(0),
-    estimatedDeliveryTime: z.number().min(1),
-  }),
+  // deliveryInfo: z.object({
+  //   isDeliveryAvailable: z.boolean().default(true),
+  //   deliveryRadius: z.number().min(0),
+  //   minimumOrderAmount: z.number().min(0).default(0),
+  //   deliveryFee: z.number().min(0).default(0),
+  //   estimatedDeliveryTime: z.number().min(1),
+  // }),
   paymentMethods: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
   categories: z.array(z.string()).optional(),
   menuItems: z.array(z.string()).optional(),
-  bank_details: bankDetailsSchema,
-  commission_rate: z.number().min(0).max(100).default(10),
+  // bank_details: bankDetailsSchema,
+  // commission_rate: z.number().min(0).max(100).default(10),
 });

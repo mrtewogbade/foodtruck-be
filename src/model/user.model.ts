@@ -22,7 +22,6 @@ const addressSchema = new Schema<IAddress>({
   street: { type: String, required: true },
   city: { type: String, required: true },
   state: { type: String, required: true },
-  zipCode: { type: String, required: true },
   country: { type: String, required: true },
   coordinates: {
     latitude: { type: Number },
@@ -134,9 +133,9 @@ const RestaurantOwnerSchema: Schema<IRestaurantOwner> = new Schema({
   restaurant: {
     type: new Schema({
       restaurantName: { type: String, required: true },
-      restaurantDescription: { type: String, required: true },
-      cuisine: [{ type: String, required: true }],
-      address: { type: addressSchema, required: true },
+      restaurantDescription: { type: String, default: null },
+      cuisine: [{ type: String, default: [] }],
+      address: { type: addressSchema, default: null },
       phone: { type: String, required: true },
       email: { type: String, required: true },
       images: [{ type: String }],

@@ -3,13 +3,15 @@ import {
   createOrUpdateRestaurant
 } from "../controller/restaurant.controller";
 import upload from "../middleware/multer";
+import VerifyAccessToken from "../middleware/verifyAccessToken";
+import validate from "../middleware/validateZod"
+import { createRestaurantSchema } from "../validations/retaurantValidation"
+
 
 
 const router = express.Router();
 
-// @route   POST /api/restaurants
-// @desc    Register a new restaurant
-router.post("/", upload.single("logo"), createOrUpdateRestaurant);
+router.post("/", VerifyAccessToken,  createOrUpdateRestaurant);
 
 
 
