@@ -1,10 +1,20 @@
-import mongoose, { Schema } from 'mongoose';
-import { IUser, IImage, BaseDocument, IOperatingHours, IAddress, ICustomer, IRestaurantOwner, IDeliveryDriver, IRating } from "../interface/user.interface";
+import mongoose, { Schema } from "mongoose";
+import {
+  IUser,
+  IImage,
+  BaseDocument,
+  IOperatingHours,
+  IAddress,
+  ICustomer,
+  IRestaurantOwner,
+  IDeliveryDriver,
+  IRating,
+} from "../interface/user.interface";
 
 // Image Schema (embedded)
 const imageSchema = new Schema<IImage>({
   key: { type: String, default: "" },
-  url: { type: String, default: "" }
+  url: { type: String, default: "" },
 });
 
 // Address Schema (embedded)
@@ -16,10 +26,10 @@ const addressSchema = new Schema<IAddress>({
   country: { type: String, required: true },
   coordinates: {
     latitude: { type: Number },
-    longitude: { type: Number }
+    longitude: { type: Number },
   },
   isDefault: { type: Boolean, default: false },
-  label: { type: String }
+  label: { type: String },
 });
 
 // Operating Hours Schema (embedded)
@@ -27,15 +37,15 @@ const operatingHoursSchema = new Schema<IOperatingHours>({
   dayOfWeek: { type: Number, required: true, min: 0, max: 6 },
   isOpen: { type: Boolean, required: true },
   openTime: { type: String },
-  closeTime: { type: String }
+  closeTime: { type: String },
 });
 
 // Rating Schema (embedded)
 const ratingSchema = new Schema<IRating>({
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   rating: { type: Number, min: 1, max: 5, required: true },
   comment: { type: String },
-  date: { type: Date, default: Date.now }
+  date: { type: Date, default: Date.now },
 });
 
 // Bank Details Schema (embedded)
@@ -44,7 +54,7 @@ const bankDetailsSchema = new Schema({
   bank_code: { type: String, default: null },
   account_name: { type: String, default: null },
   account_number: { type: String, default: null },
-  recipient: { type: String, default: null }
+  recipient: { type: String, default: null },
 });
 
 // Base User Schema
@@ -54,10 +64,10 @@ const UserSchema: Schema<IUser> = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String },
-    role: { 
-      type: String, 
-      enum: ["customer", "restaurant_owner", "delivery_driver", "admin"], 
-      required: true 
+    role: {
+      type: String,
+      enum: ["customer", "restaurant_owner", "delivery_driver", "admin"],
+      required: true,
     },
     phone_number: { type: String, default: null },
     images: [imageSchema],
@@ -75,10 +85,10 @@ const UserSchema: Schema<IUser> = new Schema(
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },
-  { 
-    toJSON: { virtuals: true }, 
+  {
+    toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    discriminatorKey: 'role'
+    discriminatorKey: "role",
   }
 );
 
@@ -114,9 +124,9 @@ const CustomerSchema: Schema<ICustomer> = new Schema({
   preferences: {
     cuisine: [{ type: String }],
     dietaryRestrictions: [{ type: String }],
-    maxDeliveryDistance: { type: Number, default: 10 }
+    maxDeliveryDistance: { type: Number, default: 10 },
   },
-  loyaltyPoints: { type: Number, default: 0 }
+  loyaltyPoints: { type: Number, default: 0 },
 });
 
 // Restaurant Owner Schema (discriminator) - DO NOT redefine 'role'
@@ -142,7 +152,7 @@ const RestaurantOwnerSchema: Schema<IRestaurantOwner> = new Schema({
       rating: {
         average: { type: Number, default: 0, min: 0, max: 5 },
         count: { type: Number, default: 0 },
-        ratings: [ratingSchema]
+        ratings: [ratingSchema],
       },
       operatingHours: [operatingHoursSchema],
       deliveryInfo: {
@@ -150,7 +160,7 @@ const RestaurantOwnerSchema: Schema<IRestaurantOwner> = new Schema({
         deliveryRadius: { type: Number, required: true },
         minimumOrderAmount: { type: Number, default: 0 },
         deliveryFee: { type: Number, default: 0 },
-        estimatedDeliveryTime: { type: Number, required: true }
+        estimatedDeliveryTime: { type: Number, required: true },
       },
       paymentMethods: [{ type: String }],
       tags: [{ type: String }],
@@ -159,7 +169,7 @@ const RestaurantOwnerSchema: Schema<IRestaurantOwner> = new Schema({
       bank_details: bankDetailsSchema,
       total_earnings: { type: Number, default: 0 },
       balance: { type: Number, default: 0 },
-      commission_rate: { type: Number, default: 10 } // 10% default platform commission
+      commission_rate: { type: Number, default: 10 }, // 10% default platform commission
     }),
     validate: {
       validator: function (v: any) {
@@ -173,19 +183,20 @@ const RestaurantOwnerSchema: Schema<IRestaurantOwner> = new Schema({
           v.email
         );
       },
-      message: "If restaurant object is provided, all required restaurant fields must be filled."
-    }
-  }
+      message:
+        "If restaurant object is provided, all required restaurant fields must be filled.",
+    },
+  },
 });
 
 // Delivery Driver Schema (discriminator) - DO NOT redefine 'role'
 const DeliveryDriverSchema: Schema<IDeliveryDriver> = new Schema({
   driver: {
     type: new Schema({
-      vehicleType: { 
-        type: String, 
-        enum: ['bike', 'car', 'scooter', 'bicycle'], 
-        required: true 
+      vehicleType: {
+        type: String,
+        enum: ["bike", "car", "scooter", "bicycle"],
+        required: true,
       },
       vehicleNumber: { type: String, required: true },
       licenseNumber: { type: String, required: true },
@@ -196,33 +207,31 @@ const DeliveryDriverSchema: Schema<IDeliveryDriver> = new Schema({
       currentLocation: {
         latitude: { type: Number },
         longitude: { type: Number },
-        lastUpdated: { type: Date, default: Date.now }
+        lastUpdated: { type: Date, default: Date.now },
       },
       deliveryZones: [{ type: String }],
       rating: {
         average: { type: Number, default: 0, min: 0, max: 5 },
         count: { type: Number, default: 0 },
-        ratings: [ratingSchema]
+        ratings: [ratingSchema],
       },
       activeOrders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
       completedOrders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
       total_earnings: { type: Number, default: 0 },
       balance: { type: Number, default: 0 },
-      bank_details: bankDetailsSchema
+      bank_details: bankDetailsSchema,
     }),
     validate: {
       validator: function (v: any) {
         if (v === undefined) return true;
         return (
-          v.vehicleType &&
-          v.vehicleNumber &&
-          v.licenseNumber &&
-          v.licenseExpiry
+          v.vehicleType && v.vehicleNumber && v.licenseNumber && v.licenseExpiry
         );
       },
-      message: "If driver object is provided, all required driver fields must be filled."
-    }
-  }
+      message:
+        "If driver object is provided, all required driver fields must be filled.",
+    },
+  },
 });
 
 // Create the base User model
@@ -230,9 +239,25 @@ const User = mongoose.model<IUser>("User", UserSchema);
 
 // Create discriminators
 const Customer = User.discriminator<ICustomer>("customer", CustomerSchema);
-const RestaurantOwner = User.discriminator<IRestaurantOwner>("restaurant_owner", RestaurantOwnerSchema);
-const DeliveryDriver = User.discriminator<IDeliveryDriver>("delivery_driver", DeliveryDriverSchema);
+const RestaurantOwner = User.discriminator<IRestaurantOwner>(
+  "restaurant_owner",
+  RestaurantOwnerSchema
+);
+const DeliveryDriver = User.discriminator<IDeliveryDriver>(
+  "delivery_driver",
+  DeliveryDriverSchema
+);
 
-export { User, Customer, RestaurantOwner, DeliveryDriver, imageSchema, addressSchema, operatingHoursSchema, ratingSchema, bankDetailsSchema };
+export {
+  User,
+  Customer,
+  RestaurantOwner,
+  DeliveryDriver,
+  imageSchema,
+  addressSchema,
+  operatingHoursSchema,
+  ratingSchema,
+  bankDetailsSchema,
+};
 
 export default UserSchema;
