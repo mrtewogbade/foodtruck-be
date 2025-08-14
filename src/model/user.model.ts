@@ -13,11 +13,11 @@ const UserSchema: Schema<IUser> = new Schema(
     role: { type: String, enum: Object.values(UserRole), default: UserRole.CUSTOMER },
     phone_number: { type: String, default: null },
     address: { type: String, default: null },
-    images: {
+    // Fixed: Single image object for profile/avatar
+    image: {
       key: { type: String, default: null },
       url: { type: String, default: null },
-      alt: { type: String, default: null },
-      default: [],
+      alt: { type: String, default: null }
     },
     googleId: { type: String },
     isEmailVerified: { type: Boolean, default: false },
@@ -33,16 +33,16 @@ const UserSchema: Schema<IUser> = new Schema(
   }
 );
 
-
+// Fixed: Virtual getter for single image
 UserSchema.virtual("imageUrl").get(function (this: IUser) {
-  return this.images?.map((image) => image.url).join(", ") || "";
+  return this.image?.url || "";
 });
 
-// Transform to hide images in JSON/Object output
+// Transform to hide image object in JSON/Object output (keeping only imageUrl virtual)
 UserSchema.set("toJSON", {
   virtuals: true,
   transform: function (doc, ret, options) {
-    delete ret.images;
+    delete ret.image;
     return ret;
   },
 });
@@ -50,11 +50,10 @@ UserSchema.set("toJSON", {
 UserSchema.set("toObject", {
   virtuals: true,
   transform: function (doc, ret, options) {
-    delete ret.images;
+    delete ret.image;
     return ret;
   },
 });
-
 
 const User = mongoose.model<IUser>("User", UserSchema);
 

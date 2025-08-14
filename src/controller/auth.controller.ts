@@ -19,6 +19,7 @@ import { NODE_ENV, RefreshToken_Secret_Key } from "../../serviceUrl";
 import GenerateRandomId, {
   generateRandomAlphanumeric,
 } from "../helpers/GenerateRandomId";
+import { add } from "winston";
 
 export const registerHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -141,7 +142,7 @@ export const verifyEmailHandler = catchAsync(
         }).catch((error: Error) =>
           console.error("Failed to send welcome email:", error)
         );
-        
+
         findUser.password = undefined;
 
         const account = {
@@ -228,7 +229,7 @@ export const loginHandler = catchAsync(
     // const user = await User.findOne({ email });
     const user: any = await User.findOne({
       $or: [{ email: phone_or_email }, { phone_number: phone_or_email }],
-    }).populate("store");
+    });
 
     if (!user) return next(new AppError("User not found", 404));
 
@@ -254,9 +255,10 @@ export const loginHandler = catchAsync(
       id: user._id,
       name: user.name,
       email: user.email,
-      // phone_number: user.phone_number,
+      phone_number: user.phone_number,
+      address: user.address,
       role: user.role,
-      // profile_image:user.imageUrl,
+      profile_image: user.imageUrl,
     };
 
     // remove password from the user object
