@@ -6,11 +6,11 @@ const RestaurantSchema: Schema<IRestaurant> = new Schema(
     _id: { type: Schema.Types.ObjectId, auto: true },
     name: { type: String, required: true },
     address: { type: String, default: null },
-    menu: [{ type: Schema.Types.ObjectId, ref: "Menu" }],
+    foodItems: [{ type: Schema.Types.ObjectId, ref: "Food" }],
     logo: [
       {
-        key: { type: String, required: true },
-        url: { type: String, required: true },
+        key: { type: String, required: false },
+        url: { type: String, required: false },
         alt: { type: String, default: null },
       },
     ],

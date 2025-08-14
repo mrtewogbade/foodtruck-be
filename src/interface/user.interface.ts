@@ -14,7 +14,7 @@ export interface IUser extends BaseDocument {
   role: UserRole;
   phone_number?: string;
   address?: string;
-  images?: { key: string; url: string; alt?: string }[];
+  image?: { key: string; url: string; alt?: string };
   is_two_factor_enabled: boolean;
   two_factor_code?: string;
   googleId?: string;

@@ -22,18 +22,6 @@ export const registerSchema = z.object({
     .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), {
       message: "Password must contain at least one special character.",
     }),
-  role: z
-    .enum(["customer", "restaurant_owner", "delivery_driver"], {
-      required_error: "Role is required",
-    })
-    .refine(
-      (value) =>
-        ["customer", "restaurant_owner", "delivery_driver"].includes(value),
-      {
-        message:
-          "Role must be either 'customer', 'restaurant_owner', or 'delivery_driver'.",
-      }
-    ),
 });
 export const verifyEmailOtpSchema = z.object({
   otp: z

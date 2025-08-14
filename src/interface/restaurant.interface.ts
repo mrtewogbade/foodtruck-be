@@ -4,7 +4,7 @@ export interface IRestaurant extends Document {
   _id: ObjectId;
   name: string;
   address: string;
-  menu: ObjectId[];
+  foodItems: ObjectId[];
   logo?: { key: string; url: string; alt?: string }[];
   rating: number;
   isOpen: boolean;
