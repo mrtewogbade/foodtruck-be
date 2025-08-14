@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  createOrUpdateRestaurant
+  createRestaurantHandler
 } from "../controller/restaurant.controller";
 import upload from "../middleware/multer";
 import VerifyAccessToken from "../middleware/verifyAccessToken";
@@ -11,7 +11,7 @@ import { createRestaurantSchema } from "../validations/retaurantValidation"
 
 const router = express.Router();
 
-router.post("/", VerifyAccessToken,  createOrUpdateRestaurant);
+router.post("/", VerifyAccessToken, upload.single("logo"), validate(createRestaurantSchema), createRestaurantHandler);
 
 
 
