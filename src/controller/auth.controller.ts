@@ -133,17 +133,15 @@ export const verifyEmailHandler = catchAsync(
         findUser.otpExpires = null;
         await findUser.save();
 
-        // Send welcome email
         await sendMail({
           email: findUser.email,
           subject: "Welcome to Foodtruck!",
           templateName: "welcome",
-          context: { name: findUser.name || "User" }, // Use name if available
+          context: { name: findUser.name || "User" },
         }).catch((error: Error) =>
           console.error("Failed to send welcome email:", error)
         );
-
-        //remove password from the user object
+        
         findUser.password = undefined;
 
         const account = {

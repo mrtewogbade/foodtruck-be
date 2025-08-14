@@ -14,9 +14,10 @@ const UserSchema: Schema<IUser> = new Schema(
     phone_number: { type: String, default: null },
     address: { type: String, default: null },
     images: {
-      key: { type: String, required: true },
-      url: { type: String, required: true },
+      key: { type: String, default: null },
+      url: { type: String, default: null },
       alt: { type: String, default: null },
+      default: [],
     },
     googleId: { type: String },
     isEmailVerified: { type: Boolean, default: false },
