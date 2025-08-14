@@ -23,10 +23,17 @@ export const registerSchema = z.object({
       message: "Password must contain at least one special character.",
     }),
   role: z
-    .enum(["customer", "restaurant_owner", "delivery_driver"], { required_error: "Role is required" })
-    .refine((value) => ["customer", "restaurant_owner", "delivery_driver"].includes(value), {
-      message: "Role must be either 'customer', 'restaurant_owner', or 'delivery_driver'.",
-    }),
+    .enum(["customer", "restaurant_owner", "delivery_driver"], {
+      required_error: "Role is required",
+    })
+    .refine(
+      (value) =>
+        ["customer", "restaurant_owner", "delivery_driver"].includes(value),
+      {
+        message:
+          "Role must be either 'customer', 'restaurant_owner', or 'delivery_driver'.",
+      }
+    ),
 });
 export const verifyEmailOtpSchema = z.object({
   otp: z
@@ -93,7 +100,6 @@ export const forgotPasswordSchema = z.object({
     .email("Invalid email address"),
 });
 
-
 export const resetPasswordSchema = z
   .object({
     password: z
@@ -117,6 +123,6 @@ export const resetPasswordSchema = z
       .min(8, "Confirm password must be at least 8 characters long"),
   })
   .refine((data) => data.password === data.confirm_password, {
-    path: ["confirm_password"],  
+    path: ["confirm_password"],
     message: "Passwords do not match",
   });

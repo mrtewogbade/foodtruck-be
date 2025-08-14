@@ -187,6 +187,60 @@ export const verifyEmailHandler = catchAsync(
   }
 );
 
+export const resendEmailVerificationHandler = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body as { email: string };
+
+    // Validate email
+    if (!email) {
+      return next(new AppError("Email is required", 400));
+    }
+
+    // Find user by email
+    const user: any = await User.findOne({ email });
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+
+    // Check if already verified
+    if (user.isEmailVerified) {
+      return next(
+        new AppError("This user has already verified their account.", 400)
+      );
+    }
+
+    // Generate new OTP (e.g., 6-digit random number)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
+    // Update user with new OTP and expiration
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+    // Send verification email
+    try {
+      await sendMail({
+        email: user.email,
+        subject: "Resend Email Verification - Foodtruck",
+        templateName: "verifyEmail", // Assuming a template for OTP verification
+        context: {
+          name: user.name || "User",
+          otp,
+          expiresIn: "24 hours",
+        },
+      });
+
+      return AppResponse(res, "Verification email resent successfully.", 200, {
+        message: "A new OTP has been sent to your email.",
+      });
+    } catch (error: any) {
+      console.error("Failed to send verification email:", error);
+      return next(new AppError("Failed to send verification email", 500));
+    }
+  }
+);
+
 export const loginHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const isMobile = req.headers.mobilereqsender;
@@ -270,3 +324,137 @@ export const loginHandler = catchAsync(
     });
   }
 );
+
+// kelvin wrote this code
+// This handler is for sending a password reset OTP to the user's email
+
+export const forgotPasswordHandler = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body as { email: string };
+
+    // Validate email input
+    if (!email) {
+      return next(new AppError("Email is required", 400));
+    }
+
+    // Normalize email
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Find user
+    const user: any = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Update user with OTP
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+    // Send reset email
+    try {
+      await sendMail({
+        email: user.email,
+        subject: "Password Reset - Foodtruck",
+        templateName: "resetPassword",
+        context: {
+          name: user.name || "User",
+          otp,
+          expiresIn: "24 hours",
+        },
+      });
+
+      return AppResponse(res, "Password reset OTP sent successfully.", 200, {
+        message: "A password reset OTP has been sent to your email.",
+      });
+    } catch (error: any) {
+      console.error("Failed to send password reset email:", error);
+      return next(new AppError("Failed to send password reset email", 500));
+    }
+  }
+);
+
+export const resetPasswordHandler = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, otp, newPassword } = req.body as {
+      email: string;
+      otp: string;
+      newPassword: string;
+    };
+
+    // Validate inputs
+    if (!email || !otp || !newPassword) {
+      return next(
+        new AppError("Email, OTP, and new password are required", 400)
+      );
+    }
+
+    // Normalize email
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Find user
+    const user: any = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+
+    // Verify OTP
+    const userDate = user.otpExpires;
+    const dateToCheck = userDate ? new Date(userDate) : new Date(0);
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    if (user.otp !== otp) {
+      return next(new AppError("Invalid OTP", 400));
+    }
+
+    if (dateToCheck < twentyFourHoursAgo) {
+      return next(
+        new AppError("This OTP has expired. Please request a new one.", 400)
+      );
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user
+    user.password = hashedPassword;
+    user.otp = "";
+    user.otpExpires = null;
+    await user.save();
+
+    // Send confirmation email
+    await sendMail({
+      email: user.email,
+      subject: "Password Reset Successful - Foodtruck",
+      templateName: "passwordResetConfirmation",
+      context: { name: user.name || "User" },
+    }).catch((error: Error) =>
+      console.error("Failed to send password reset confirmation email:", error)
+    );
+
+    // Prepare response
+    user.password = undefined;
+    const account = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+
+    const accessToken = GenerateAccessToken(account);
+    const refreshToken = GenerateRefreshToken(account);
+
+    return AppResponse(res, "Password reset successful.", 200, {
+      accessToken,
+      refreshToken,
+      account,
+    });
+  }
+);
+
+
