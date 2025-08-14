@@ -14,6 +14,7 @@ import ConnectDB from "./src/configs/db.config";
 import AppError from "./src/error/AppError";
 import GlobalErrorHandler from "./src/error/errorHandler";
 import authRoutes from "./src/routes/auth.routes";
+import restaurantRoutes from "./src/routes/restaurant.routes"
 
 
 import logger, { logRequest } from "./src/middleware/logger";
@@ -72,6 +73,7 @@ app.use(compression({ filter: shouldCompress }));
 
   //All Routes comes in Here
   app.use("/v1/api/auth", authRoutes);
+  app.use("/v1/api/restaurant", restaurantRoutes)
 // app.use("/v1/api/user", userRoutes);
 
 
