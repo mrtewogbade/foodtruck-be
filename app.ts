@@ -74,7 +74,7 @@ app.use(compression({ filter: shouldCompress }));
   //All Routes comes in Here
   app.use("/v1/api/auth", authRoutes);
   app.use("/v1/api/restaurant", restaurantRoutes)
-// app.use("/v1/api/user", userRoutes);
+
 
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
