@@ -5,7 +5,7 @@ import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import catchAsync from "../error/catchAsync";
 import AppResponse from "../helpers/AppResponse";
-import { User } from "../model/user.model";
+import { User, Customer, RestaurantOwner, DeliveryDriver } from "../model/user.model";
 import AppError from "../error/AppError";
 import sendMail from "../configs/nodemailer.config";
 
@@ -18,6 +18,8 @@ import { NODE_ENV, RefreshToken_Secret_Key } from "../../serviceUrl";
 import GenerateRandomId, {
   generateRandomAlphanumeric,
 } from "../helpers/GenerateRandomId";
+
+
 
 export const registerHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -33,26 +35,24 @@ export const registerHandler = catchAsync(
     let user;
 
     if (role === "customer") {
-      user = await User.create({
+      user = await Customer.create({
         name,
         email,
         password: hashedPassword,
-        role,
       });
     } else if (role === "restaurant_owner") {
-      user = await User.create({
+      user = await RestaurantOwner.create({
         name,
         email,
         password: hashedPassword,
-        role,
-        restaurantId: GenerateRandomId(),
+        // Note: restaurantId is not in your schema, so I'm removing it
+        // If you need it, add it to the RestaurantOwnerSchema
       });
     } else if (role === "delivery_driver") {
-      user = await User.create({
+      user = await DeliveryDriver.create({
         name,
         email,
         password: hashedPassword,
-        role,
       });
     } else {
       return next(new AppError("Invalid role", 400));
@@ -71,6 +71,7 @@ export const registerHandler = catchAsync(
     const otpCode = generateRandomAlphanumeric();
     user.otp = otpCode;
     user.otpExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    
     const mailOptions = {
       email,
       subject: "Verify Your Email Address",
