@@ -34,4 +34,8 @@ export const createRestaurantHandler = catchAsync(
   }
 );
 
+// update restaurant
+// delete restaurant
+// get restaurant by id
+// get all restaurants
 

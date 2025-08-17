@@ -14,6 +14,9 @@ export interface IUser extends BaseDocument {
   role: UserRole;
   phone_number?: string;
   address?: string;
+  favourites: Array<{ itemId: ObjectId; addedAt: Date }>;
+  cart: Array<{ itemId: ObjectId; addedAt: Date }>;
+  orders: Array<{ orderId: ObjectId; createdAt: Date }>;
   image?: { key: string; url: string; alt?: string };
   is_two_factor_enabled: boolean;
   two_factor_code?: string;
