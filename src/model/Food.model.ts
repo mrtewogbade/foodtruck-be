@@ -4,7 +4,7 @@ import { IFood } from "../interface/food.interface";
 const FoodSchema: Schema<IFood> = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, auto: true },
-    restaurant: { type: Schema.Types.ObjectId, ref: "Restaurant", required: true },
+    restaurant: { type: Schema.Types.ObjectId, ref: "Restaurant", required: true, default: "Foodtruck" },
     name: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },

@@ -13,6 +13,18 @@ const UserSchema: Schema<IUser> = new Schema(
     role: { type: String, enum: Object.values(UserRole), default: UserRole.CUSTOMER },
     phone_number: { type: String, default: null },
     address: { type: String, default: null },
+    favourites: [
+      {
+        itemId: { type: Schema.Types.ObjectId, ref: "Food" },
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
+    cart: [
+      {
+        itemId: { type: Schema.Types.ObjectId, ref: "Food" },
+        quantity: { type: Number, default: 1 },
+      },
+    ],
     // Fixed: Single image object for profile/avatar
     image: {
       key: { type: String, default: null },

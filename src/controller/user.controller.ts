@@ -1,6 +1,9 @@
 // Here you are going to implement the user-related functionalities
 
-// get all users
-// delete a user
-// update a user
-// get user by id
+
+// get user profile
+// update user profile
+// get all users (admin only)
+// delete a user (admin only)
+// update a user (admin only)
+// get user by id (admin only)
