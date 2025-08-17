@@ -1,5 +1,3 @@
-//This middleware will verify the accessToken on every request made to the server
-
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import AppError from "../error/AppError";
@@ -7,8 +5,7 @@ import {
   AccessToken_Secret_Key,
   Tracking_Token_Secret_Key,
 } from "../../serviceUrl";
-import { User } from "../model/user.model";
-
+import User from "../model/user.model";
 
 interface CustomRequest extends Request {
   user?: any;
@@ -31,8 +28,6 @@ const VerifyAccessToken = async (
     if (!token) {
       return next(new AppError("No access token provided", 401));
     }
-
-    // Convert callback-style to Promise-style for better error handling
     const decoded = await new Promise((resolve, reject) => {
       jwt.verify(
         token as string,
@@ -51,12 +46,7 @@ const VerifyAccessToken = async (
         new AppError("User does not exist or account has been deleted.", 404)
       );
     }
-
-    // Attach the full user object to the request instead of just the payload
     req.user = user;
-
-    // console.log('Auth Header:', req.headers.authorization);
-    // console.log('User attached to request:', req.user);  // Debug log
 
     next();
   } catch (error) {

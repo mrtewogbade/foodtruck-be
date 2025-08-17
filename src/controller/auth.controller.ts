@@ -5,12 +5,8 @@ import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import catchAsync from "../error/catchAsync";
 import AppResponse from "../helpers/AppResponse";
-import UserSchema, {
-  User,
-  Customer,
-  RestaurantOwner,
-  DeliveryDriver,
-} from "../model/user.model";
+import User from "../model/user.model";
+import { IUser } from "../interface/user.interface";
 import AppError from "../error/AppError";
 import sendMail from "../configs/nodemailer.config";
 
@@ -23,10 +19,11 @@ import { NODE_ENV, RefreshToken_Secret_Key } from "../../serviceUrl";
 import GenerateRandomId, {
   generateRandomAlphanumeric,
 } from "../helpers/GenerateRandomId";
+import { add } from "winston";
 
 export const registerHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { role, name, email, password } = req.body;
+    const { name, email, password, phone_number, address, } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -37,34 +34,18 @@ export const registerHandler = catchAsync(
 
     let user;
 
-    if (role === "customer") {
-      user = await Customer.create({
-        name,
-        email,
-        password: hashedPassword,
-      });
-    } else if (role === "restaurant_owner") {
-      user = await RestaurantOwner.create({
-        name,
-        email,
-        password: hashedPassword,
-        // Note: restaurantId is not in your schema, so I'm removing it
-        // If you need it, add it to the RestaurantOwnerSchema
-      });
-    } else if (role === "delivery_driver") {
-      user = await DeliveryDriver.create({
-        name,
-        email,
-        password: hashedPassword,
-      });
-    } else {
-      return next(new AppError("Invalid role", 400));
-    }
+    user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone_number,
+      address,
+    });
 
     if (user == undefined) {
       return next(
         new AppError(
-          "User can either be a customer, restaurant owner or delivery driver",
+          "User registration failed",
           500
         )
       );
@@ -109,7 +90,8 @@ export const registerHandler = catchAsync(
     const account = {
       name,
       email,
-      role,
+      phone_number,
+      address,
     };
 
     return AppResponse(
@@ -152,17 +134,15 @@ export const verifyEmailHandler = catchAsync(
         findUser.otpExpires = null;
         await findUser.save();
 
-        // Send welcome email
         await sendMail({
           email: findUser.email,
           subject: "Welcome to Foodtruck!",
           templateName: "welcome",
-          context: { name: findUser.name || "User" }, // Use name if available
+          context: { name: findUser.name || "User" },
         }).catch((error: Error) =>
           console.error("Failed to send welcome email:", error)
         );
 
-        //remove password from the user object
         findUser.password = undefined;
 
         const account = {
@@ -249,7 +229,7 @@ export const loginHandler = catchAsync(
     // const user = await User.findOne({ email });
     const user: any = await User.findOne({
       $or: [{ email: phone_or_email }, { phone_number: phone_or_email }],
-    }).populate("store");
+    });
 
     if (!user) return next(new AppError("User not found", 404));
 
@@ -275,9 +255,10 @@ export const loginHandler = catchAsync(
       id: user._id,
       name: user.name,
       email: user.email,
-      // phone_number: user.phone_number,
+      phone_number: user.phone_number,
+      address: user.address,
       role: user.role,
-      // profile_image:user.imageUrl,
+      profile_image: user.imageUrl,
     };
 
     // remove password from the user object
