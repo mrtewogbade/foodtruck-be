@@ -7,7 +7,6 @@ import helmet from "helmet";
 import compression from "compression";
 import http from "http";
 import path from "path";
-import multer from "multer";
 
 import ConnectDB from "./src/configs/db.config";
 
@@ -17,28 +16,34 @@ import authRoutes from "./src/routes/auth.routes";
 import restaurantRoutes from "./src/routes/restaurant.routes"
 import userRoutes from "./src/routes/user.routes"
 
-
 import logger, { logRequest } from "./src/middleware/logger";
 import { COOKIE_SECRET, PORT } from "./serviceUrl";
-
-
 
 dotenv.config();
 const port = PORT || 8081;
 
 const app = express();
 
-
-
 process.on("uncaughtException", (err: Error) => {
   logger.error("Unhandled Exception, shutting down...");
   logger.error(`${err.name}: ${err.message}`);
   process.exit(1);
 });
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// Configure body parsers to skip multipart/form-data
+app.use(express.json({ 
+  limit: '10mb',
+  type: ['application/json', 'text/plain']
+}));
+
+app.use(express.urlencoded({ 
+  extended: true, 
+  limit: '10mb',
+  type: 'application/x-www-form-urlencoded'
+}));
+
 app.set("trust proxy", 1);
-app.use(multer().any());
+
 
 app.use(
   cors({
@@ -58,13 +63,12 @@ app.use(
 app.set("views", path.join(__dirname, "src/views"));
 app.set("view engine", "ejs");
 
-//This code is converting our req.body to a string which is actually false.
 // app.use(sanitizeInputs);
 app.use(mongoSanitize());
 app.use(logRequest);
+
 const shouldCompress = (req: express.Request, res: express.Response) => {
   if (req.headers["x-no-compression"]) {
-    // Don't compress responses if this request header is present
     return false;
   }
   return compression.filter(req, res);
@@ -74,8 +78,7 @@ app.use(compression({ filter: shouldCompress }));
 
   //All Routes comes in Here
   app.use("/v1/api/auth", authRoutes);
-  app.use("/v1/api/restaurant", restaurantRoutes);
-  app.use("/v1/api/users", userRoutes);
+  app.use("/v1/api/restaurant", restaurantRoutes)
 
 
 
@@ -90,6 +93,7 @@ app.use("*", (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(GlobalErrorHandler);
+
 const server = ConnectDB().then(() => {
   const httpServer = http.createServer(app);
   httpServer.listen(port, () => {
@@ -106,4 +110,3 @@ process.on("unhandledRejection", (err: Error) => {
     process.exit(1);
   });
 });
-
