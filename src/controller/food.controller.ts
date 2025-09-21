@@ -235,13 +235,11 @@ export const deleteFoodAdminOnly = catchAsync(
 
     const { id } = validatedData.data;
 
-    // Find food item by ID
     const food = await Food.findById(id);
     if (!food) {
       return next(new AppError('Food item not found', 404));
     }
 
-    // Delete the food item
     await Food.deleteOne({ _id: id });
 
     return AppResponse(res, 'Food item deleted successfully', 200, {
