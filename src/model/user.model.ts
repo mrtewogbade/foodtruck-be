@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-import mongoose, { Schema } from 'mongoose';
-import { IUser, IImage, BaseDocument, IOperatingHours, IAddress, ICustomer, IRestaurantOwner, IDeliveryDriver, IRating } from "../interface/user.interface";
-=======
 import mongoose, { Schema } from "mongoose";
 import {
   IUser,
 } from "../interface/user.interface";
 import { UserRole } from "../enums/user.emum";
->>>>>>> ade2f66325eec79174e95be68ab798f2a3c55125
 
 const UserSchema: Schema<IUser> = new Schema(
   {
