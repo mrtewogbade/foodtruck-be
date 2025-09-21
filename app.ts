@@ -57,7 +57,6 @@ app.use(
 app.set("views", path.join(__dirname, "src/views"));
 app.set("view engine", "ejs");
 
-//This code is converting our req.body to a string which is actually false.
 // app.use(sanitizeInputs);
 app.use(mongoSanitize());
 app.use(logRequest);
